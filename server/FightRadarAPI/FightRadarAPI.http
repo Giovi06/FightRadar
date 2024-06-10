@@ -1,0 +1,6 @@
+@FightRadarAPI_HostAddress = http://localhost:5065
+
+GET {{FightRadarAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
