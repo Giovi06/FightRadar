@@ -2,26 +2,44 @@ import { useState } from 'react';
 import { signupFields } from "../constants/formField";
 import Input from "./input";
 import FormAction from "./formAction";
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 const fields=signupFields;
 let fieldsState={};
 
 fields.forEach(field => fieldsState[field.id]='');
 
-export default function Signup(){
-  const [signupState,setSignupState]=useState(fieldsState);
+export default function Signup() {
+  const [signupState, setSignupState] = useState(fieldsState);
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
-  const handleChange=(e)=>setSignupState({...signupState,[e.target.id]:e.target.value});
+  const handleChange = (e) => setSignupState({ ...signupState, [e.target.id]: e.target.value });
 
-  const handleSubmit=(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(signupState)
-    createAccount()
+    console.log(signupState);
+    
+    createAccount();
+}
+
+  // Handle Signup API Integration here
+  const createAccount = async () => {
+    try {
+      // Only send one password field to the API
+      const { confirmPassword, ...userData } = signupState;
+      console.log(userData);
+      const response = await axios.post('http://localhost:3001/api/user/register', userData); // Assuming the endpoint is correct
+      if (response.status === 201) {
+          navigate('/'); // Redirect to '/login' upon successful account creation
+      } else {
+          console.log('Account creation failed');
+      }
+      // Handle other response statuses as needed
+  } catch (error) {
+      console.error(error);
   }
-
-  //handle Signup API Integration here
-  const createAccount=()=>{
-
   }
 
     return(
