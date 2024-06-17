@@ -29,6 +29,9 @@ export default function Login() {
             console.log(loginState);
             const response = await axios.post('http://localhost:3001/api/user/login', loginState);
             if (response.status === 200) {
+                console.log(response.data)
+                const { userId } = response.data;
+                localStorage.setItem('userId', userId);
                 navigate('/home'); // Redirect to '/home' upon successful login
             } else if (response.status === 401) {
                 console.log('Unauthorized');

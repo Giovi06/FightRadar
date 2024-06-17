@@ -25,6 +25,6 @@ namespace FightRadarAPI.Models
         [JsonPropertyName("DateOfBirth")]
         public DateOnly DateOfBirth { get; set; } */
         
-        public List<string>? Matches { get; set; }
+        public List<Fight>? Matches { get; set; }
     }
 }
