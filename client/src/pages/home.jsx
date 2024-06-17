@@ -1,8 +1,8 @@
-
-export default function LoginPage() {
+import Home from '../components/home';
+export default function HomePage() {
   return (
     <>
-      <p>Welcome to FightRadar</p>
+      <Home />
     </>
   );
 }

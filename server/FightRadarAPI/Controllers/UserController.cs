@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FightRadarAPI.Models;
 using FightRadarAPI.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -16,11 +17,46 @@ namespace FightRadarAPI.Controllers
             _userService = userService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        [HttpPost]
+        [Route("login")]
+        public ActionResult Login([FromBody] User user)
         {
-            var users = await _userService.GetUsersAsync();
-            return Ok(users);
+            bool loggedIn = _userService.Authenticate(user.Email, user.Password);
+            if (loggedIn == false)
+            {
+                return Unauthorized();
+            }
+            return Ok(loggedIn);
+        }
+
+        [HttpPost]
+        [Route("register")]
+        public async Task<ActionResult<User>> CreateUser(User user)
+        {
+            await _userService.CreateUserAsync(user);
+            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+        }
+
+        [HttpGet]
+        [Route("fighters")]
+        public async Task<ActionResult<IEnumerable<User>>> GetFighters(int _id)
+        {
+            var users = (await _userService.GetUsersAsync()).ToList();
+            List<User> fighters = [];
+            foreach (User user in users)
+            {
+                User fighter = new()
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Email = user.Email,
+                    Matches = user.Matches
+                };
+                if(user.Id == _id.ToString()) { users.Remove(user);}
+                fighters.Add(fighter);
+            }
+
+            return Ok(fighters);
         }
 
         [HttpGet("{id:length(24)}")]
@@ -33,29 +69,45 @@ namespace FightRadarAPI.Controllers
                 return NotFound();
             }
 
-            return user;
+            return Ok(user.Username);
         }
 
-        [AllowAnonymous]
         [HttpPost]
-        [Route("login")]
-
-        public ActionResult Login( [FromBody] User user)
+        [Route("newfight")]
+        public async Task<ActionResult<User>> PostFight(User user, string fighterId)
         {
-            bool loggedIn = _userService.Authenticate(user.Email, user.Password);
-            if(loggedIn == false){
-                return Unauthorized();
+            if(fighterId == null)
+            {
+                return BadRequest("Fighter ID is required");
             }
-            return Ok(loggedIn);
-        }
+            if(user == null)
+            {
+                return BadRequest("User is required");
+            }
 
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("register")]
-        public async Task<ActionResult<User>> CreateUser(User user)
-        {
-            await _userService.CreateUserAsync(user);
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            User fighter = await _userService.GetUserAsync(fighterId);
+
+            if(fighter == null)
+            {
+                return NotFound("Fighter not found");
+            }
+            user.Matches ??= [];
+            fighter.Matches ??= [];
+            if(fighter.Id == null || user.Id == null)
+            {
+                return BadRequest("User and fighter must have an ID");
+            }
+            try
+            {
+                user.Matches.Add(fighter.Id);
+                fighter.Matches.Add(user.Id);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        
+            return CreatedAtAction("Fight", new { user.Matches }, user.Matches);
         }
     }
 }

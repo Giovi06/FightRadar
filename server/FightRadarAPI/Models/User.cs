@@ -21,6 +21,10 @@ namespace FightRadarAPI.Models
         [JsonPropertyName("Email")]
         public string Email { get; set; } = null!;
         
-        /* public DateOnly DateOfBirth { get; set; } */
+/*         [BsonElement("DateOfBirth")]
+        [JsonPropertyName("DateOfBirth")]
+        public DateOnly DateOfBirth { get; set; } */
+        
+        public List<string>? Matches { get; set; }
     }
 }
