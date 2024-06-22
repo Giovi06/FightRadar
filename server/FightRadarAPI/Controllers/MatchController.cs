@@ -26,27 +26,32 @@ namespace FightRadarAPI.Controllers
             var fighters = new List<User>();
             foreach (var user in users)
             {
-                if (user.Id == _id.ToString()) continue;
-
-                fighters.Add(new User
+                if (user.Id != _id.ToString())
                 {
-                    Id = user.Id,
-                    Username = user.Username,
-                    Email = user.Email,
-                    Matches = user.Matches
-                });
+                    fighters.Add(new User
+                    {
+                        Id = user.Id,
+                        Username = user.Username,
+                        Email = user.Email,
+                        Matches = user.Matches
+                    });
+                }
             }
 
             return Ok(fighters);
         }
-        [HttpGet("{_id:length(24)}/fighter")]
-        public async Task<ActionResult<IEnumerable<User>>> GetFighter(string _id)
+        [HttpGet("{_id:length(24)}/randomfighter")]
+        public async Task<ActionResult<IEnumerable<User>>> GetRandomFighter(string _id)
         {
             if (string.IsNullOrEmpty(_id))
             {
                 return BadRequest("User ID is required");
             }
             User fighter = await _userService.GetRandomFighter(_id);
+            if(fighter == null)
+            {
+                return NotFound();
+            }
             return Ok(fighter);
         }
 
@@ -63,7 +68,6 @@ namespace FightRadarAPI.Controllers
             {
                 return NotFound();
             }
-
             return Ok(user.Matches ?? []);
         }
 
@@ -97,9 +101,23 @@ namespace FightRadarAPI.Controllers
                 return BadRequest("User and fighter must have an ID");
             }
 
-            var fight = new Fight
+            var fightUser = new Fight
             {
-                Opponent = fighter.Username,
+                Opponent = new Opponent
+                {
+                    Username = fighter.Username,
+                    Id = fighter.Id
+                },
+                Result = "Pending",
+                Date = DateTime.Now.ToString()
+            };
+            var fightFighter = new Fight
+            {
+                Opponent = new Opponent
+                {
+                    Username = user.Username,
+                    Id = user.Id
+                },
                 Result = "Pending",
                 Date = DateTime.Now.ToString()
             };
@@ -109,8 +127,64 @@ namespace FightRadarAPI.Controllers
                 user.Matches ??= new List<Fight>();
                 fighter.Matches ??= new List<Fight>();
 
-                user.Matches.Add(fight);
-                fighter.Matches.Add(fight);
+                user.Matches.Add(fightUser);
+                fighter.Matches.Add(fightFighter);
+
+                await _userService.UpdateUserAsync(user.Id, user);
+                await _userService.UpdateUserAsync(fighter.Id, fighter);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+                
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete("{Id:length(24)}/deletefight")]
+        public async Task<ActionResult> DeleteFight(string Id, [FromBody] Fight fight)
+        {
+            
+            if (string.IsNullOrEmpty(Id))
+            {
+                return BadRequest("User ID is required");
+            }
+
+            if (string.IsNullOrEmpty(fight.Opponent?.Id))
+            {
+                return BadRequest($"Fight ID is required: {fight}");
+            }
+
+            var user = await _userService.GetUserAsync(Id);
+            var fighter = await _userService.GetUserAsync(fight.Opponent.Id);
+
+            if (fighter == null)
+            {
+                return NotFound("Fighter not found");
+            }
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            if (fighter.Id == null || user.Id == null)
+            {
+                return BadRequest("User and fighter must have an ID");
+            }
+
+            var userFight = user.Matches?.FirstOrDefault(f => f.Opponent?.Id == fighter.Id);
+            var fighterFight = fighter.Matches?.FirstOrDefault(f => f.Opponent?.Id == user.Id);
+
+            if (userFight == null || fighterFight == null)
+            {
+                return NotFound("Fight not found");
+            }
+
+            try
+            {
+                user.Matches?.Remove(userFight);
+                fighter.Matches?.Remove(fighterFight);
 
                 await _userService.UpdateUserAsync(user.Id, user);
                 await _userService.UpdateUserAsync(fighter.Id, fighter);
@@ -120,9 +194,8 @@ namespace FightRadarAPI.Controllers
                 return BadRequest(e.Message);
             }
 
-            return Ok();
+            return NoContent();
         }
-
         public class FightRequest
         {
             public string? FighterId { get; set; }

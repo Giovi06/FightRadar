@@ -22,7 +22,6 @@ export default function UserMatches({ fighterId }) {
   return (
     <div>
       <p>Matchcount: {matches.length}</p>
-      
     </div>
   );
 }

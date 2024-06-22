@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Navigate, useNavigate } from 'react-router-dom';
 import axios from "axios";
 import {
   Card,
@@ -8,43 +9,44 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import UserMatches from "./matches";
+import UserMatches from "./matchesCount";
 
 const Home = () => {
-  const userId = "666fcf4d7029a57983addb12";
+  const userId = localStorage.getItem("userId");
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   const getFighter = async () => {
-    try {
+    
       const response = await axios.get(
-        `http://localhost:3001/api/match/${userId}/fighter`,
+        `http://localhost:3001/api/match/${userId}/randomfighter`,
         {
           headers: {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
           }
         }
-      );
+      ).catch((error) => {
+        console.error("Error fetching fighter:", error);
+        return null;
+      });
       return response.data;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
   };
 
   const postFighterChoice = async (fighterId) => {
     console.log(userId, fighterId);
-    try {
+    
       const response = await axios.post(
         "http://localhost:3001/api/match/newfight",
         {
           UserId: userId,
           FighterId: fighterId,
         }
-      );
-      console.log(response.status, response.data);
-    } catch (error) {
-      console.error(error);
-    }
+      ).catch((error) => {
+        console.error("Error posting fighter choice:", error);
+      }).then((response) => {
+        console.log(response);
+      });
+      
   };
 
   const [currentFighter, setCurrentFighter] = useState(null);
@@ -59,6 +61,10 @@ const Home = () => {
 
   const handleNoClick = async () => {
     const data = await getFighter();
+    if(data === null)
+      {
+        console.log("No more fighters");
+      }
     setCurrentFighter(data);
   };
 
@@ -67,6 +73,7 @@ const Home = () => {
     if (fighterId) {
       postFighterChoice(fighterId);
     }
+    navigate("/matches");
   };
 
   return (
@@ -80,9 +87,9 @@ const Home = () => {
           <CardContent>
             <UserMatches fighterId={currentFighter.Id} />
           </CardContent>
-          <CardFooter>
-            <button onClick={handleNoClick}>Nein</button>
-            <button onClick={handleYesClick}>Ja</button>
+          <CardFooter class="flex justify-between">
+            <button class=" h-11 rounded-md px-8 bg-secondary text-secondary-foreground hover:bg-secondary/80" onClick={handleNoClick}>No</button>
+            <button class=" h-11 rounded-md px-8 bg-secondary text-secondary-foreground hover:bg-secondary/80" onClick={handleYesClick}>Yes</button>
           </CardFooter>
         </Card>
       )}

@@ -50,6 +50,11 @@ namespace FightRadarAPI.Services
                 // Find one document at the random index
                 List<User> randomFighterList = await _usersCollection.Find(filter).Skip(randomIndex).Limit(1).ToListAsync();
 
+                if (randomFighterList.Count == 0)
+                {
+                    throw new Exception("Fighter List Empty");
+                }
+
                 // Return the first (and only) user in the list
                 return randomFighterList.FirstOrDefault() ?? throw new Exception("No random fighter found");
             }

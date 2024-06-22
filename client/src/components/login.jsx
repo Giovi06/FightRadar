@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {  useState } from 'react';
 import { loginFields } from "../constants/formField";
 import { Navigate, useNavigate } from 'react-router-dom';
 import Input from "./input";
@@ -13,6 +13,7 @@ fields.forEach(field=>fieldsState[field.id]='');
 export default function Login() {
     const [loginState, setLoginState] = useState(fieldsState);
     const navigate = useNavigate(); // Initialize useNavigate hook
+    const [userId, setUserId] = useState(Number(localStorage.getItem('userId') || 0));
 
     const handleChange = (e) => {
         setLoginState({ ...loginState, [e.target.id]: e.target.value });
@@ -20,19 +21,25 @@ export default function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        authenticateUser();
+        const res = await authenticateUser();
+        handleId(res);
+
     }
+
+    const handleId = (_userId) => {
+        setUserId(_userId);
+        localStorage.setItem('userId', _userId);
+        navigate('/home'); // Redirect to '/home' upon successful login
+      }
 
     // Handle Login API Integration here
     const authenticateUser = async () => {
         try {
-            console.log(loginState);
             const response = await axios.post('http://localhost:3001/api/user/login', loginState);
             if (response.status === 200) {
-                console.log(response.data)
-                const { userId } = response.data;
-                localStorage.setItem('userId', userId);
-                navigate('/home'); // Redirect to '/home' upon successful login
+
+                return response.data;
+                
             } else if (response.status === 401) {
                 console.log('Unauthorized');
             }
