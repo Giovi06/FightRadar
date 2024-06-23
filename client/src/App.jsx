@@ -4,6 +4,7 @@ import SignupPage from "./pages/signup";
 import LoginPage from "./pages/login";
 import Home from "./pages/home";
 import Matches from "./pages/matches";
+import ProfileSetttings from "./pages/profileSettings";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/home" element={<Home />}></Route>
           <Route path="/matches" element={<Matches />}></Route>
+          <Route path="/profilesettings" element={<ProfileSetttings />}></Route>
         </Routes>
       </BrowserRouter>
     </div>

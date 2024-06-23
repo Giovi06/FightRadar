@@ -20,13 +20,10 @@ namespace FightRadarAPI.Models
         [BsonElement("Email")]
         [JsonPropertyName("Email")]
         public string Email { get; set; } = null!;
-        
-        /* public byte[]? Image { get; set; } */
-
-/*         [BsonElement("DateOfBirth")]
-        [JsonPropertyName("DateOfBirth")]
-        public DateOnly DateOfBirth { get; set; } */
-        
         public List<Fight>? Matches { get; set; }
+        public string? Gewicht { get; set; }
+        public string? Erfahrungen { get; set; }
+        public string? Kampfstil { get; set; }
+        public string? Gewichtsklasse { get; set; }
     }
 }
