@@ -1,30 +1,37 @@
 using FightRadarAPI.Models;
 using FightRadarAPI.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FightRadarAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController(UserService userService) : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly UserService _userService = userService;
 
-        public UserController(UserService userService)
+        [HttpPost]
+        [Route("login")]
+        public async Task<ActionResult<User>> Login([FromBody] User requestUser)
         {
-            _userService = userService;
+            User? user = await _userService.Authenticate(requestUser.Email, requestUser.Password);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+            return Ok(user.Id);
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        [HttpPost]
+        [Route("register")]
+        public async Task<ActionResult<User>> CreateUser(User user)
         {
-            var users = await _userService.GetUsersAsync();
-            return Ok(users);
+            await _userService.CreateUserAsync(user);
+            return CreatedAtAction("GetUsername", new { id = user.Id }, user);
         }
 
         [HttpGet("{id:length(24)}")]
-        public async Task<ActionResult<User>> GetUser(string id)
+        public async Task<ActionResult<User>> GetUsername(string id)
         {
             var user = await _userService.GetUserAsync(id);
 
@@ -33,29 +40,58 @@ namespace FightRadarAPI.Controllers
                 return NotFound();
             }
 
-            return user;
+            return Ok(user.Username);
         }
 
-        [AllowAnonymous]
-        [HttpPost]
-        [Route("login")]
-
-        public ActionResult Login( [FromBody] User user)
+        [HttpPut]
+        [Route("update")]
+        public async Task<IActionResult> UpdateUser([FromQuery] string id, [FromBody] UserDTO userDTO)
         {
-            bool loggedIn = _userService.Authenticate(user.Email, user.Password);
-            if(loggedIn == false){
-                return Unauthorized();
+            try
+            {
+                if (userDTO == null)
+                {
+                    return BadRequest();
+                }
+                if (string.IsNullOrEmpty(id))
+                {
+                    return BadRequest();
+                }
+
+                var user = await _userService.GetUserAsync(id);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                user.Username = userDTO.Username;
+                user.Password = userDTO.Password;
+                user.Email = userDTO.Email;
+                user.Gewicht = userDTO.Gewicht;
+                user.Erfahrungen = userDTO.Erfahrungen;
+                user.Kampfstil = userDTO.Kampfstil;
+                user.Gewichtsklasse = userDTO.Gewichtsklasse;
+
+            await _userService.UpdateUserAsync(id, user);
             }
-            return Ok(loggedIn);
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
+            return NoContent();
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("register")]
-        public async Task<ActionResult<User>> CreateUser(User user)
-        {
-            await _userService.CreateUserAsync(user);
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
-        }
+    }
+    public class UserDTO
+    {
+        public string Username { get; set; } = null!;
+        public string Password { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string? Gewicht { get; set; }
+        public string? Erfahrungen { get; set; }
+        public string? Kampfstil { get; set; }
+        public string? Gewichtsklasse { get; set; }
     }
 }

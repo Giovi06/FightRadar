@@ -1,77 +1,149 @@
-const loginFields=[
-    {
-        labelText:"Username",
-        labelFor:"username",
-        id:"username",
-        name:"username",
-        type:"text",
-        autoComplete:"username",
-        isRequired:true,
-        placeholder:"Username"   
-    },
-    {
-        labelText:"Email address",
-        labelFor:"email",
-        id:"email",
-        name:"email",
-        type:"email",
-        autoComplete:"email",
-        isRequired:true,
-        placeholder:"Email address"   
-    },
-    {
-        labelText:"Password",
-        labelFor:"password",
-        id:"password",
-        name:"password",
-        type:"password",
-        autoComplete:"current-password",
-        isRequired:true,
-        placeholder:"Password"   
-    }
-]
+const loginFields = [
+  {
+    labelText: "Username",
+    labelFor: "username",
+    id: "username",
+    name: "username",
+    type: "text",
+    autoComplete: "username",
+    isRequired: true,
+    placeholder: "Username",
+  },
+  {
+    labelText: "Email address",
+    labelFor: "email",
+    id: "email",
+    name: "email",
+    type: "email",
+    autoComplete: "email",
+    isRequired: true,
+    placeholder: "Email address",
+  },
+  {
+    labelText: "Password",
+    labelFor: "password",
+    id: "password",
+    name: "password",
+    type: "password",
+    autoComplete: "current-password",
+    isRequired: true,
+    placeholder: "Password",
+  },
+];
 
-const signupFields=[
-    {
-        labelText:"Username",
-        labelFor:"username",
-        id:"username",
-        name:"username",
-        type:"text",
-        autoComplete:"username",
-        isRequired:true,
-        placeholder:"Username"   
-    },
-    {
-        labelText:"Email address",
-        labelFor:"email",
-        id:"email",
-        name:"email",
-        type:"email",
-        autoComplete:"email",
-        isRequired:true,
-        placeholder:"Email address"   
-    },
-    {
-        labelText:"Password",
-        labelFor:"password",
-        id:"password",
-        name:"password",
-        type:"password",
-        autoComplete:"current-password",
-        isRequired:true,
-        placeholder:"Password"   
-    },
-    {
-        labelText:"Confirm Password",
-        labelFor:"confirm-password",
-        id:"confirm-password",
-        name:"confirm-password",
-        type:"password",
-        autoComplete:"confirm-password",
-        isRequired:true,
-        placeholder:"Confirm Password"   
-    }
-]
+const signupFields = [
+  {
+    labelText: "Username",
+    labelFor: "username",
+    id: "username",
+    name: "username",
+    type: "text",
+    autoComplete: "username",
+    isRequired: true,
+    placeholder: "Username",
+  },
+  {
+    labelText: "Email address",
+    labelFor: "email",
+    id: "email",
+    name: "email",
+    type: "email",
+    autoComplete: "email",
+    isRequired: true,
+    placeholder: "Email address",
+  },
+  {
+    labelText: "Password",
+    labelFor: "password",
+    id: "password",
+    name: "password",
+    type: "password",
+    autoComplete: "current-password",
+    isRequired: true,
+    placeholder: "Password",
+  },
+  {
+    labelText: "Confirm Password",
+    labelFor: "confirm-password",
+    id: "confirm-password",
+    name: "confirm-password",
+    type: "password",
+    autoComplete: "confirm-password",
+    isRequired: true,
+    placeholder: "Confirm Password",
+  },
+];
+const profileFields = [
+  {
+    labelText: "Username",
+    labelFor: "username",
+    id: "username",
+    name: "username",
+    type: "text",
+    autoComplete: "username",
+    isRequired: true,
+    placeholder: "Username",
+  },
+  {
+    labelText: "Email address",
+    labelFor: "email",
+    id: "email",
+    name: "email",
+    type: "email",
+    autoComplete: "email",
+    isRequired: true,
+    placeholder: "Email address",
+  },
+  {
+    labelText: "Password",
+    labelFor: "password",
+    id: "password",
+    name: "password",
+    type: "password",
+    autoComplete: "current-password",
+    isRequired: true,
+    placeholder: "Password",
+  },
+  {
+    labelText: "Erfahrungen",
+    labelFor: "Erfahrungen",
+    id: "erfahrungen",
+    name: "erfahrungen",
+    type: "erfahrungen",
+    autoComplete: "erfahrungen",
+    isRequired: true,
+    placeholder: "Meine persönlichen Erfahrungen im Boxen...",
+  },
+  {
+    labelText: "Kampfstil",
+    labelFor: "kampfstil",
+    id: "kampfstil",
+    name: "kampfstil",
+    type: "kampfstil",
+    autoComplete: "kampfstil",
+    isRequired: true,
+    placeholder: "Muai-Thai, Karate, etc...",
+  },
+  {
+    labelText: "Gewichtsklasse",
+    labelFor: "gewichtsklasse",
+    id: "gewichtsklasse",
+    name: "gewichtsklasse",
+    type: "gewichtsklasse",
+    autoComplete: "gewichtsklasse",
+    isRequired: true,
+    placeholder: "Leichtgewicht, Schwergewicht, etc...",
+  },
+  {
+    labelText: "Gewicht",
+    labelFor: "gewicht",
+    id: "gewicht",
+    name: "gewicht",
+    type: "gewicht",
+    autoComplete: "gewicht",
+    isRequired: true,
+    placeholder: "68kg",
+  }
+];
 
-export {loginFields,signupFields}
+export { loginFields, signupFields, profileFields };

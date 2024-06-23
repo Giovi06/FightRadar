@@ -1,5 +1,6 @@
 using FightRadarAPI.Models;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq; // Add this using directive
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
@@ -33,6 +34,37 @@ namespace FightRadarAPI.Services
         {
             return await _usersCollection.Find(user => user.Id == Id).FirstOrDefaultAsync();
         }
+        public async Task<User> GetRandomFighter(string userId)
+        {
+            try
+            {
+                // Constructing the filter to find a random user excluding the userId
+                var filter = Builders<User>.Filter.Ne(u => u.Id, userId);
+
+                // Count total documents matching the filter
+                long count = await _usersCollection.CountDocumentsAsync(filter);
+
+                // Generate a random index to skip to a random document
+                var randomIndex = new Random().Next(0, (int)count);
+
+                // Find one document at the random index
+                List<User> randomFighterList = await _usersCollection.Find(filter).Skip(randomIndex).Limit(1).ToListAsync();
+
+                if (randomFighterList.Count == 0)
+                {
+                    throw new Exception("Fighter List Empty");
+                }
+
+                // Return the first (and only) user in the list
+                return randomFighterList.FirstOrDefault() ?? throw new Exception("No random fighter found");
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions here
+                Console.WriteLine($"Error fetching random fighter: {ex.Message}");
+                throw;
+            }
+        }
 
         public async Task<User> CreateUserAsync(User user)
         {
@@ -51,16 +83,15 @@ namespace FightRadarAPI.Services
             await _usersCollection.DeleteOneAsync(u => u.Id == Id);
         }
 
-        public bool Authenticate(string email, string password)
+        public Task<User?> Authenticate(string email, string password)
         {
             var user = _usersCollection.Find(u => u.Email == email && u.Password == password).FirstOrDefault();
             if (user == null)
             {
-                return false;
+                return Task.FromResult<User?>(null);
             }
 
-            return true;
-
+            return Task.FromResult<User?>(user);
         }
     }
 }
