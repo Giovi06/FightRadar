@@ -12,14 +12,12 @@ export default function UserMatches({}) {
     .get(`http://localhost:3001/api/match/${userId}/matches`)
     .catch((error) => {
       console.error("Error fetching matches:", error);
-    })
-    .then((response) => {
-      setMatches(response.data);
-      setLoading(false);
     });
+    setMatches(response.data);
   };
   useEffect(() => {
     fetchMatches();
+    setLoading(false);
   }, [userId]);
   
   const removeMatch = async (match) => {
